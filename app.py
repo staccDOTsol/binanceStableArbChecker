@@ -14,6 +14,7 @@ bids = {}
 bidAmts = {}
 asks = {}
 askAmts = {}
+alreadyDone = []
 while True:
 	oldest_stream_data_from_stream_buffer = binance_websocket_api_manager.pop_stream_data_from_stream_buffer()
 	if oldest_stream_data_from_stream_buffer:
@@ -29,8 +30,10 @@ while True:
 		arb = (float(asks[order]) / float(bids[order]) - 1) * 100#/  1.1 / 0.9
 		
 		if arb > fee:
-			print(order + ': ' + str(arb))
-			if float(bidAmts[order]) < float(askAmts[order]):	
-				print(str(bidAmts[order]) + ' available at this price!')
-			else:
-				print(str(askAmts[order]) + ' available at this price!')
+			if {'askAmts': askAmts[order], 'bidAmts': bidAmts[order]} not in alreadyDone:
+				alreadyDone.append({'askAmts': askAmts[order], 'bidAmts': bidAmts[order]})
+				print(order + ': ' + str(arb))
+				if float(bidAmts[order]) < float(askAmts[order]):	
+					print(str(bidAmts[order]) + ' available at this price!')
+				else:
+					print(str(askAmts[order]) + ' available at this price!')
